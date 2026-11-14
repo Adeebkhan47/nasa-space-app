@@ -523,6 +523,116 @@ async function setLayer(key) {
     };
   }
   paintLayer();
+  updateLayerBtn();
+}
+
+function renderLayerMenu() {
+  const layer = $("layer");
+  const menu = $("layerMenu");
+  if (!layer || !menu) return;
+  layer.innerHTML = "";
+  menu.innerHTML = "";
+
+  layer.appendChild(new Option("Analog score", "score"));
+  for (const c of state.criteria) layer.appendChild(new Option(`Data: ${c.label}`, c.key));
+
+  const items = [
+    { key: "score", title: "Analog score", desc: "Overall multi-criteria match", badge: "0..1", group: "Computed Score" },
+    ...state.criteria.map((c) => ({
+      key: c.key,
+      title: c.label,
+      desc: c.description || c.label,
+      badge: c.unit || "data",
+      group: "Earth Predictors",
+    })),
+  ];
+
+  let currentGroup = "";
+  items.forEach((item) => {
+    if (item.group !== currentGroup) {
+      currentGroup = item.group;
+      const groupEl = document.createElement("div");
+      groupEl.className = "layer-menu-group";
+      groupEl.textContent = currentGroup;
+      menu.appendChild(groupEl);
+    }
+    const el = document.createElement("div");
+    el.className = `layer-item${item.key === state.layer ? " selected" : ""}`;
+    el.setAttribute("role", "option");
+    el.setAttribute("data-key", item.key);
+    el.setAttribute("aria-selected", String(item.key === state.layer));
+    el.innerHTML = `
+      <div class="layer-item-head">
+        <span class="layer-item-title">${esc(item.title)}</span>
+        <span class="layer-item-badge">${esc(item.badge)}</span>
+      </div>
+      <div class="layer-item-desc">${esc(item.desc.length > 55 ? item.desc.slice(0, 52) + "…" : item.desc)}</div>
+    `;
+    el.addEventListener("click", () => {
+      selectLayer(item.key);
+      closeLayerMenu();
+    });
+    menu.appendChild(el);
+  });
+  updateLayerBtn();
+}
+
+function updateLayerBtn() {
+  const btnText = $("layerBtnText");
+  const indicator = $("layerIndicator");
+  const isScore = state.layer === "score";
+  if (btnText) {
+    if (isScore) {
+      btnText.textContent = "Analog score";
+    } else {
+      const c = spec(state.layer);
+      btnText.textContent = c ? c.label : state.layer;
+    }
+  }
+  if (indicator) {
+    indicator.className = `layer-indicator${isScore ? "" : " predictor"}`;
+  }
+  const menu = $("layerMenu");
+  if (menu) {
+    menu.querySelectorAll(".layer-item").forEach((el) => {
+      const active = el.dataset.key === state.layer;
+      el.classList.toggle("selected", active);
+      el.setAttribute("aria-selected", String(active));
+    });
+  }
+}
+
+function selectLayer(key) {
+  const layer = $("layer");
+  if (layer) {
+    layer.value = key;
+    layer.dispatchEvent(new Event("change"));
+  }
+}
+
+function toggleLayerMenu(e) {
+  e?.stopPropagation();
+  const dropdown = $("layerDropdown");
+  const menu = $("layerMenu");
+  const btn = $("layerBtn");
+  if (!dropdown || !menu) return;
+  const isOpen = !menu.hidden;
+  if (isOpen) {
+    closeLayerMenu();
+  } else {
+    menu.hidden = false;
+    dropdown.classList.add("open");
+    btn?.setAttribute("aria-expanded", "true");
+  }
+}
+
+function closeLayerMenu() {
+  const dropdown = $("layerDropdown");
+  const menu = $("layerMenu");
+  const btn = $("layerBtn");
+  if (menu) menu.hidden = true;
+  if (dropdown) dropdown.classList.remove("open");
+  if (btn) btn?.setAttribute("aria-expanded", "false");
 }
 
 /* ----------------------------------------------------------------- targets */
@@ -589,7 +699,7 @@ function renderTargetDetail() {
   caption.innerHTML = `<strong>${esc(t.short_name)}</strong>${esc(t.body)} target · ${fmtCoord(t.latitude, t.longitude)}
     <span class="twin-hint">drag to rotate · double-click to reset</span>`;
   $("twin").hidden = !twin;
-  if (twin) twin.show(t.body, t.latitude, t.longitude).catch(() => {});
+  if (twin) twin.show(t.body, t.latitude, t.longitude).catch(() => { });
 }
 
 /* ------------------------------------------------------------ custom target */
@@ -983,7 +1093,7 @@ function renderValidation() {
 let dataChecks = null;
 function dataChecksTable() {
   if (!dataChecks) {
-    api("/api/datachecks").then((r) => { dataChecks = r.checks; renderValidation(); }).catch(() => {});
+    api("/api/datachecks").then((r) => { dataChecks = r.checks; renderValidation(); }).catch(() => { });
     return "";
   }
   return `<h4 class="section-title">Do the datasets agree?</h4>
@@ -1563,13 +1673,63 @@ function writeHash() {
   history.replaceState(null, "", `#${parts.join("&")}`);
 }
 
+function wireTheme() {
+  const toggle = $("themeToggle");
+  const getStored = () => {
+    try {
+      return localStorage.getItem("theme");
+    } catch (_) {
+      return null;
+    }
+  };
+  const setStored = (val) => {
+    try {
+      localStorage.setItem("theme", val);
+    } catch (_) {}
+  };
+  const updateToggleUI = (isLight) => {
+    if (!toggle) return;
+    toggle.setAttribute("aria-label", isLight ? "Switch to dark theme" : "Switch to light theme");
+    toggle.setAttribute("title", isLight ? "Switch to dark theme" : "Switch to light theme");
+    toggle.setAttribute("aria-pressed", isLight ? "true" : "false");
+  };
+  const applyTheme = (theme, persist = false) => {
+    const isLight = theme === "light";
+    if (isLight) {
+      document.documentElement.setAttribute("data-theme", "light");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+    if (persist) setStored(theme);
+    updateToggleUI(isLight);
+  };
+
+  const currentTheme = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+  updateToggleUI(currentTheme === "light");
+
+  toggle?.addEventListener("click", () => {
+    const active = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+    const next = active === "light" ? "dark" : "light";
+    applyTheme(next, true);
+  });
+
+  if (window.matchMedia) {
+    const mq = window.matchMedia("(prefers-color-scheme: light)");
+    mq.addEventListener("change", (e) => {
+      if (!getStored()) {
+        applyTheme(e.matches ? "light" : "dark", false);
+      }
+    });
+  }
+}
+
 /* -------------------------------------------------------------------- boot */
 
 async function init() {
+  wireTheme();
   wireDialogs();
   wireSearch();
   wireUi();
-  $("surprise").addEventListener("click", surprise);
   wireTour();
   wireKeys();
   document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
@@ -1611,7 +1771,17 @@ async function init() {
     globe.setOverlayOpacity(v);
     flat.setOverlayOpacity(v);
   });
-  $("layer").addEventListener("change", (e) => setLayer(e.target.value).catch((err) => toast(err.message)));
+  $("layer").addEventListener("change", (e) => {
+    setLayer(e.target.value).catch((err) => toast(err.message));
+    updateLayerBtn();
+  });
+  $("layerBtn")?.addEventListener("click", toggleLayerMenu);
+  document.addEventListener("click", (e) => {
+    if (!$("layerDropdown")?.contains(e.target)) closeLayerMenu();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeLayerMenu();
+  });
 
   try {
     const [health, targets, criteria, sources, analogs] = await Promise.all([
@@ -1639,9 +1809,7 @@ async function init() {
 
     $("chipMode").innerHTML = health.offline ? `<span class="dot on"></span>Offline mode · local data` : `<span class="dot"></span>Online`;
     $("chipCells").textContent = `${fmtInt(health.candidate_cells)} land cells`;
-    const layer = $("layer");
-    layer.appendChild(new Option("Analog score", "score"));
-    for (const c of state.criteria) layer.appendChild(new Option(`Data: ${c.label}`, c.key));
+    renderLayerMenu();
 
     renderTargets();
     renderTargetDetail();

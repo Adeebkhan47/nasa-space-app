@@ -44,9 +44,9 @@ CRITERIA: tuple[str, ...] = (
     "precipitation",
     "vegetation",
     "annual_temperature_range",
+    "roughness",
     "lst_diurnal_range",
     "slope",
-    "roughness",
     "elevation",
     "mean_annual_temperature",
 )
