@@ -1,0 +1,23 @@
+# Environments and local files
+.venv/
+venv/
+.env
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+__pycache__/
+*.pyc
+
+# Development scripts, tests, and documentation
+tests/
+scripts/
+docs/
+demo_fixtures/
+
+# Cache directories (keep derived datasets and predictors.zarr)
+cache/raw/*
+!cache/raw/ne_*.geojson
+cache/tiles/
+cache/sitetiles/
+cache/peek/
+
