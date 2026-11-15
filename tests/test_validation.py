@@ -39,24 +39,16 @@ def _grid() -> np.ndarray:
     return score
 
 
-def test_roc_auc_counts_wins_and_ties():
-    assert validation.roc_auc([0.9, 0.8], [0.1, 0.2]) == pytest.approx(1.0)
-    assert validation.roc_auc([0.1], [0.9]) == pytest.approx(0.0)
-    assert validation.roc_auc([0.5], [0.5]) == pytest.approx(0.5)
-    assert validation.roc_auc([], [0.5]) is None
-
-
 def test_validate_uses_environment_sites_of_the_right_body():
     report = validation.validate(_grid(), "Mars", CATALOG)
     roles = {c["name"]: c["role"] for c in report["controls"]}
     assert roles == {"Known A": "positive", "Rocks B": "geology", "Wet C": "negative"}
-    assert report["auc"] == pytest.approx(1.0)
     assert report["positives"] == 1 and report["negatives"] == 1
     known = next(c for c in report["controls"] if c["name"] == "Known A")
     assert known["percentile"] > 99.0
 
     moon = validation.validate(_grid(), "Moon", CATALOG)
-    assert moon["positives"] == 0 and moon["auc"] is None
+    assert moon["positives"] == 0
 
 
 def test_sites_on_unscored_cells_snap_to_the_nearest_scored_cell():

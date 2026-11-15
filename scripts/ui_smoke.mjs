@@ -47,7 +47,7 @@ await send("Runtime.enable");
 await send("Page.navigate", { url: `${BASE}/#target=jezero_crater` });
 await sleep(12000);
 check("ranked sites listed", (await js(`document.querySelectorAll('.site').length`)) >= 5);
-check("validation chip shows AUC", /AUC/.test(await js(`document.getElementById('chipAuc').textContent`)));
+check("chips container present", !!(await js(`document.querySelector('.chips')`)));
 check("legend rendered", !!(await js(`document.querySelector('#legend .ramp')`)));
 for (const layer of ["vegetation", "annual_temperature_range", "mean_annual_temperature", "slope"]) {
   await js(`(() => { const s = document.getElementById('layer'); s.value = '${layer}'; s.dispatchEvent(new Event('change')); })()`);

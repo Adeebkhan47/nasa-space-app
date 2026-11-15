@@ -12,8 +12,8 @@ Uncertainty (Monte Carlo)
 
 Sensitivity (leave one criterion out)
     For each active criterion, re-score with its weight set to 0 and report the
-    validation ROC-AUC and the new top site. A result that survives dropping
-    any single criterion does not hinge on one dataset.
+    new top site. A result that survives dropping any single criterion does not
+    hinge on one dataset.
 """
 
 from __future__ import annotations
@@ -84,7 +84,7 @@ def sensitivity(
     mask: np.ndarray,
     catalog: Mapping[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
-    """Validation AUC and top cell with each active criterion removed in turn."""
+    """Top cell with each active criterion removed in turn."""
     out = []
     active = [k for k in CRITERIA if weights.get(k, 0) > 0 and profile.get(k) is not None]
     for key in active:
@@ -92,12 +92,10 @@ def sensitivity(
             break
         reduced = {**weights, key: 0.0}
         result = compute_similarity(stack, profile, reduced, ranges)
-        report = validation.validate(result.score, body, catalog, tag)
         top = rank_top(result.score, mask, k=1)
         out.append(
             {
                 "without": key,
-                "auc": report["auc"],
                 "top_index": top[0] if top else None,
             }
         )

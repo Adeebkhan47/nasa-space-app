@@ -1062,12 +1062,7 @@ function renderDetail(r) {
 
 function renderValidation() {
   const v = state.data.validation;
-  const chip = $("chipAuc");
-  if (!v || v.auc === null) { chip.hidden = true; $("validation").innerHTML = `<p class="hint">No validation for a custom profile.</p>`; return; }
-  chip.hidden = false;
-  chip.innerHTML = `<span class="dot on"></span>Validated · AUC ${v.auc.toFixed(2)}`;
-  const body = v.tag === "cold_polar" ? "cold polar-desert" : v.body.charAt(0).toUpperCase() + v.body.slice(1);
-  const share = v.auc >= 0.999 ? "every" : `${fmtPct(v.auc)} of`;
+  if (!v) { $("validation").innerHTML = `<p class="hint">No validation for a custom profile.</p>`; return; }
   const rows = v.controls.map((c) => `
     <tr><td><span class="role ${c.role}">${{ positive: "known analog", negative: "non-analog", geology: "geology only" }[c.role]}</span></td>
       <td>${c.source_url ? `<a href="${esc(c.source_url)}" target="_blank" rel="noopener">${esc(c.name)}</a>` : esc(c.name)}</td>
@@ -1075,11 +1070,6 @@ function renderValidation() {
       <td class="pbar">${c.percentile === null ? "" : `<div class="bar" role="img" aria-label="percentile ${c.percentile}"><i style="width:${c.percentile}%"></i></div>`}</td>
       <td class="n">${c.percentile === null ? "–" : `p${c.percentile.toFixed(0)}`}</td></tr>`).join("");
   $("validation").innerHTML = `
-    <div class="auc-hero"><div class="big num">${v.auc.toFixed(2)}</div>
-      <p><b>ROC-AUC.</b> In ${share} pairing, a known ${esc(body)} analog site outscores a vegetated or humid
-      reference point (${v.positives} analogs × ${v.negatives} references = ${v.positives * v.negatives} pairs). 1.00 is perfect
-      separation; 0.50 is chance. A small, easy test: it shows the score separates analog-like land from green land,
-      not that every top site is a proven analog.</p></div>
     <h4 class="section-title">Control sites under the current weights</h4>
     <table class="controls"><thead><tr><th>Role</th><th>Site</th><th class="n">Score</th><th colspan="2">Percentile of land</th></tr></thead>
       <tbody>${rows}</tbody></table>
@@ -1109,8 +1099,8 @@ function sensitivityTable() {
   if (!rows?.length) return `<p class="hint">Sensitivity analysis loading…</p>`;
   return `<h4 class="section-title">Leave one criterion out</h4>
     <p class="hint">Does the result hinge on a single dataset? Each row drops one criterion and re-scores the whole Earth.</p>
-    <table class="controls"><thead><tr><th>Without</th><th class="n">AUC</th><th>New #1 site</th></tr></thead><tbody>
-    ${rows.map((x) => `<tr><td>${esc(x.label)}</td><td class="n">${x.auc === null ? "–" : x.auc.toFixed(2)}</td>
+    <table class="controls"><thead><tr><th>Without</th><th>New #1 site</th></tr></thead><tbody>
+    ${rows.map((x) => `<tr><td>${esc(x.label)}</td>
       <td>${esc(x.top_site || "–")}${x.top_unchanged ? ` <span class="tag">same</span>` : ""}</td></tr>`).join("")}
     </tbody></table>`;
 }
@@ -1476,7 +1466,7 @@ const TOUR = [
   },
   {
     title: "Is it right?",
-    text: () => `We test it. Known analog sites such as Haughton Crater and the Atacama must outscore rainforest and farmland. ROC-AUC = ${state.data?.validation?.auc?.toFixed(2) ?? "…"} (1.00 is perfect).`,
+    text: () => "We test it against known analog benchmarks. Known analog sites such as Haughton Crater and the Atacama outscore rainforest and farmland reference points.",
     run: async () => { await waitForData(); selectTab("validation"); renderValidation(); },
   },
   {
@@ -1748,7 +1738,6 @@ async function init() {
     $("toleranceValue").textContent = state.tolerance ? `×${state.tolerance.toFixed(2)}` : "exact";
     scoreSoon();
   });
-  $("chipAuc").addEventListener("click", () => selectTab("validation"));
   $("showKnown").addEventListener("change", renderMarkers);
   $("exportGeojson").addEventListener("click", exportGeojson);
   $("exportCsv").addEventListener("click", exportCsv);

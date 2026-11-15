@@ -636,7 +636,6 @@ def robustness_report(request: ScoreRequest) -> dict[str, Any]:
                 {
                     "without": row["without"],
                     "label": _ranges()[row["without"]].label,
-                    "auc": row["auc"],
                     "top_site": _label_for(lat, lon)["text"] if lat is not None else None,
                     "top_unchanged": top == (indices[0] if indices else None),
                 }
@@ -961,7 +960,7 @@ def validation_report(
     target_id: str = Query(...),
     weights: str | None = Query(default=None, description="Comma separated key:weight pairs."),
 ) -> dict[str, Any]:
-    """Known-analog validation (ROC-AUC and control percentiles) for one target."""
+    """Known-analog validation (control percentiles) for one target."""
     request = ScoreRequest(target_id=target_id, weights=_parse_weights(weights))
     result, _, _ = _score(request)
     entry = _targets()[target_id]

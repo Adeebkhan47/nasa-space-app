@@ -18,7 +18,7 @@ def main() -> None:
     for target in client.get("/api/targets").json()["targets"]:
         report = client.get("/api/validation", params={"target_id": target["id"]}).json()
         print(
-            f"\n== {target['id']} ({report['body']})  ROC-AUC {report['auc']}  "
+            f"\n== {target['id']} ({report['body']})  "
             f"median known-analog percentile {report['median_positive_percentile']}"
         )
         for c in report["controls"]:

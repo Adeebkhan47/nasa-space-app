@@ -1396,28 +1396,6 @@ pre.json {
 }
 
 /* validation */
-.auc-hero {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  padding: 14px;
-  border-radius: var(--radius);
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-}
-
-.auc-hero .big {
-  font-size: 38px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-.auc-hero p {
-  color: var(--ink-2);
-  font-size: 12.5px;
-}
-
 .controls {
   width: 100%;
   border-collapse: collapse;

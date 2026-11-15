@@ -4,9 +4,7 @@ Deterministic, no model involved.
 
 Validation
     For a score surface, every catalogued site (``data/known_analogs.json``) and
-    every negative reference point is located on the grid and ranked. The
-    headline number is ROC-AUC: the probability that a randomly chosen positive
-    control outscores a randomly chosen negative one (Mann-Whitney U / n1 n2).
+    every negative reference point is located on the grid and ranked.
     Positives are the ``environment`` sites whose ``bodies`` include the target's
     body; ``geology`` sites are reported but not counted, because they were
     chosen for rocks the model does not measure.
@@ -68,16 +66,6 @@ def nearest_scored(score: np.ndarray, lat: float, lon: float) -> tuple[int, int]
     return None if best is None else best[1]
 
 
-def roc_auc(positives: list[float], negatives: list[float]) -> float | None:
-    """Mann-Whitney AUC with ties counted as one half."""
-    if not positives or not negatives:
-        return None
-    pos = np.asarray(positives, dtype=np.float64)[:, None]
-    neg = np.asarray(negatives, dtype=np.float64)[None, :]
-    wins = (pos > neg).sum() + 0.5 * (pos == neg).sum()
-    return float(wins / (pos.size * neg.size))
-
-
 @dataclass(frozen=True)
 class Control:
     name: str
@@ -106,7 +94,7 @@ def validate(
     catalog: Mapping[str, Any] | None = None,
     tag: str | None = None,
 ) -> dict[str, Any]:
-    """Rank every control on one score surface and summarise with ROC-AUC.
+    """Rank every control on one score surface and summarise with control percentiles.
 
     With ``tag``, positives are the environment sites carrying that tag (any
     body); otherwise they are the environment sites of ``body``.
@@ -141,13 +129,12 @@ def validate(
     return {
         "body": body,
         "tag": tag,
-        "auc": None if (auc := roc_auc(pos, neg)) is None else round(auc, 4),
         "positives": len(pos),
         "negatives": len(neg),
         "median_positive_percentile": round(float(np.median(pos_pct)), 1) if pos_pct else None,
         "controls": [c.as_dict() for c in controls],
         "method": (
-            "ROC-AUC of environment-analog sites for this body against densely vegetated "
+            "Environment-analog sites for this body evaluated against densely vegetated "
             "or humid reference points; percentile is the share of scored land cells "
             "below the site's score."
         ),
