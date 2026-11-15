@@ -228,11 +228,9 @@ TerraNova uses a deterministic mathematical approach rather than relying on an A
 
 For each environmental criterion, the system calculates how close an Earth measurement is to the target value.
 
-\[
-s_k(x)=\operatorname{clip}\left(
-1-\frac{|x_k-t'_k|}{hi_k-lo_k},0,1
-\right)
-\]
+$$
+s_k(x) = \operatorname{clip}\left(1 - \frac{|x_k - t'_k|}{hi_k - lo_k},\ 0,\ 1\right)
+$$
 
 Where:
 
