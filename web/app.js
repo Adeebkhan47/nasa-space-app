@@ -1027,7 +1027,7 @@ function renderDetail(r) {
     </div>
     <div class="detail-actions">
       <button class="godseye-button" type="button" id="openEye" ${Math.abs(r.lat) > 84 ? "disabled title=\"Elevation tiles stop at about 84 degrees latitude\"" : ""}>
-        <span aria-hidden="true">◉</span> God's Eye 3D view</button>
+        <span aria-hidden="true">◉</span> 3D View</button>
       <button class="ghost small" type="button" id="pinSite">${state.pins.some((x) => x.index === r.index) ? "Unpin" : "Pin to compare"}</button>
     </div>
     <p class="notice">${novText}</p>
@@ -1465,7 +1465,7 @@ const TOUR = [
     run: async () => { if (!state.selected) selectResult(state.data.results[0]); },
   },
   {
-    title: "God's Eye",
+    title: "3D View",
     text: "Descend into the site's real terrain in 3D, lit the way the Sun lights the lunar pole: never more than about 1.5° above the horizon, with black shadows.",
     run: async () => { await openGodsEye(state.selected || state.data.results[0], "lunar"); },
   },
@@ -1600,7 +1600,7 @@ function renderMethod() {
     <h3>3 · Validate</h3>
     <p>Known analog sites (Haughton Crater, McMurdo Dry Valleys, Atacama, Apollo training sites and others, each cited) should
       outscore densely vegetated reference points. The Validation tab reports ROC-AUC for the current target and weights.</p>
-    <h3>4 · Look closer: God's Eye</h3>
+    <h3>4 · Look closer: 3D View</h3>
     <p>Open any site in 3D. Its terrain comes from AWS Terrain Tiles at about 150 m, draped with Sentinel-2 cloud-free
       imagery (ESA Copernicus data processed by EOX). The panel measures relief and slope inside the scored cell at that
       finer scale, including the share of ground a rover could drive (slopes under 15°). You can light it with a lunar polar sun.</p>
