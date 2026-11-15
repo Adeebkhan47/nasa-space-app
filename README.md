@@ -1,387 +1,581 @@
-# TerraNova
+ <div align="center">
 
-[![NASA Space Apps Challenge 2026](https://img.shields.io/badge/NASA%20Space%20Apps-2026-005EB8?style=flat&logo=nasa&logoColor=white)](https://www.spaceappschallenge.org/)
-[![Challenge](https://img.shields.io/badge/Challenge-Earth%20Analog%20Discovery-2ea043?style=flat)](https://www.spaceappschallenge.org/)
-[![Team DaRK_MATTER](https://img.shields.io/badge/Team-DaRK__MATTER-f08a4b?style=flat)](https://github.com/Yakiyo/terra-nova)
-[![License](https://img.shields.io/badge/License-Apache--2.0-blue?style=flat)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:071A2F,50:123D5A,100:1D9E75&height=220&section=header&text=TERRA2MARS%20AI&fontSize=58&fontColor=ffffff&animation=fadeIn&fontAlignY=36&desc=Discovering%20Earth's%20Best%20Planetary%20Analogues&descAlignY=58&descSize=17" width="100%"/>
 
-**Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars**
+# 🌍 Terra2Mars AI
 
-Open-source discovery platform that scores **78,247** land cells on Earth (0.5° resolution, ~55 km at the equator) against published **Moon and Mars base-site profiles**, ranks the best terrestrial analogs on an interactive **3D globe**, explains every criterion with **dataset citations**, flags **novel** candidates versus catalogued sites, and validates scores against **known analog benchmarks**.
+### Finding Earth Locations That Resemble the Moon and Mars
 
-**Team DaRK_MATTER**  · [Repository](https://github.com/Yakiyo/terra-nova)
+[![NASA Space Apps](https://img.shields.io/badge/NASA-Space%20Apps%202026-0B3D91?style=for-the-badge&logo=nasa&logoColor=white)](https://www.spaceappschallenge.org/)
+[![Python](https://img.shields.io/badge/Python-Backend-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![JavaScript](https://img.shields.io/badge/Frontend-JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Three.js](https://img.shields.io/badge/3D-Three.js-black?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org)
+[![NASA Data](https://img.shields.io/badge/Data-NASA%20Earth%20Science-0B3D91?style=for-the-badge&logo=nasa&logoColor=white)](https://earthdata.nasa.gov)
 
----
+<br/>
 
-## Table of contents
+**78,247 Earth land cells. Multiple planetary targets. One global discovery platform.**
 
-1. [The operational bottleneck](#the-operational-bottleneck)
-2. [What TerraNova does](#what-terranova-does)
-3. [System architecture](#system-architecture)
-4. [Scoring model](#scoring-model)
-5. [Validation](#validation)
-6. [NASA and partner data sources](#nasa-and-partner-data-sources)
-7. [Technology stack](#technology-stack)
-8. [Repository layout](#repository-layout)
-9. [Quick start](#quick-start)
-10. [HTTP API (summary)](#http-api-summary)
-11. [Target, status, and roadmap](#target-status-and-roadmap)
-12. [Team and credits](#team-and-credits)
-13. [License](#license)
+*Bringing planetary science and Earth observation together.*
+
+</div>
 
 ---
 
-## The operational bottleneck
+## 📖 Overview
 
-Artemis and Mars surface missions depend on **testing hardware on Earth first**—rovers, drills, habitats, navigation in shadow, and thermal extremes. Teams historically rely on a **small set of famous analogs** (e.g. Devon Island, Atacama, volcanic training fields in the U.S. Southwest, Mauna Kea).
+**Terra2Mars AI** is a planetary analogue discovery platform that identifies locations on Earth with environmental and terrain characteristics similar to selected locations on the Moon and Mars.
 
-No single Earth site copies the Moon or Mars:
+Space agencies need to understand how extraterrestrial environments may affect future exploration missions. However, studying these environments directly is difficult and expensive.
 
-| Mismatch | Why it matters |
-|----------|----------------|
-| **Multi-parameter** | Good slope ≠ good regolith chemistry ≠ barren ground ≠ correct thermal swing. |
-| **No 1:1 physics** | Lunar permanently shadowed regions (~25–40 K, vacuum) cannot exist on open Earth (~−93 °C max, with atmosphere). |
-| **Under-characterized globe** | Many hyper-arid, polar, and volcanic terrains are **not** in standard analog lists. |
+Terra2Mars AI addresses this challenge by comparing planetary target conditions with real Earth observation data and ranking locations according to their similarity.
 
-TerraNova treats analog search as an **operational proxy problem**: match the **engineering and environmental stresses** mission hardware must survive, using **open NASA and partner geospatial data**, with **transparent, reproducible scoring**—not a black-box “AI guess.”
+### 🌎 What Does Terra2Mars AI Do?
 
----
+- 🛰️ **Analyzes Earth Data** — Uses NASA and partner satellite datasets.
+- 🌕 **Compares Moon Locations** — Evaluates Earth locations against selected lunar sites.
+- 🔴 **Compares Mars Locations** — Finds potential Earth analogues for Martian environments.
+- 📊 **Ranks Similar Locations** — Calculates similarity scores using measurable criteria.
+- 🌐 **Visualizes the Planet** — Displays results on an interactive 3D globe and flat map.
+- 🔍 **Explains Results** — Shows which environmental conditions influence each ranking.
 
-## What TerraNova does
-
-| Capability | Description |
-|------------|-------------|
-| **Target profiles** | Shackleton rim, Malapert Massif, Haworth cold trap, Jezero, Gale, or a **custom** signature (`data/targets.json`). |
-| **Global screening** | Every scorable land cell compared on precipitation, vegetation (NDVI), temperature ranges, MODIS LST diurnal swing, slope, and roughness. |
-| **Ranked discovery** | 3D globe heatmap, top-*N* list, **novelty** (`new` / `near_known` / `known` vs `data/known_analogs.json`). |
-| **Explainability** | Per-criterion similarity, weights, sources, and rule-based site cards (`src/agents/rationale.py`). |
-| **Validation** | ROC-AUC vs catalog analogs and humid **negative controls**; leave-one-criterion-out and stability probes. |
-| **God's Eye 3D** | Local DEM mesh (~150 m), optional Sentinel-2 drape, **lunar low-sun** preset, slope/rover-trafficability stats, GeoJSON/CSV export. |
-
-**Design principle:** scoring at request time is **deterministic arithmetic** in `src/compute`—no LLM, no randomness, no network when `OFFLINE=1`.
-
-For **full vision vs what this repository ships today**, see [Target, status, and roadmap](#target-status-and-roadmap).
+> **Our goal:** Make planetary analogue discovery more accessible, explainable, and data-driven.
 
 ---
 
-## System architecture
+## ✨ Key Features
 
-End-to-end pipeline (offline build → online query):
+<table>
+<tr>
+<td width="50%">
 
+### 🌍 Interactive 3D Earth Globe
+
+Explore Earth through an interactive globe.
+
+- Global location visualization
+- Similarity score layers
+- Environmental predictor layers
+- Interactive location selection
+
+</td>
+<td width="50%">
+
+### 🌕 Moon & Mars Target Profiles
+
+Compare Earth with selected planetary locations.
+
+- Shackleton Rim
+- Malapert Massif
+- Haworth Cold Trap
+- Jezero Crater
+- Gale Crater
+- Custom target profiles
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 📊 Scientific Similarity Scoring
+
+A deterministic mathematical scoring engine evaluates how closely Earth locations match planetary target conditions.
+
+- Weighted criteria
+- Normalized measurements
+- Similarity ranking
+- Explainable results
+
+</td>
+<td width="50%">
+
+### 🗺️ God's Eye 3D Terrain Explorer
+
+Explore selected locations at a more detailed scale.
+
+- Local elevation models
+- Terrain slope and relief
+- 3D terrain visualization
+- Optional satellite imagery
+- Rover trafficability metrics
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 🔬 Explainable Analysis
+
+Understand why a location receives a particular score.
+
+- Criterion-level similarity
+- Weight contribution
+- Data source information
+- Location-specific explanations
+
+</td>
+<td width="50%">
+
+### 📥 Data Export & Validation
+
+Work with results outside the platform.
+
+- CSV export
+- GeoJSON export
+- Validation against known analogues
+- Robustness testing
+- Leave-one-criterion-out analysis
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🛰️ How Terra2Mars AI Works
+
+Terra2Mars AI follows a data-driven workflow to identify potential Earth analogues.
+
+```mermaid
+flowchart TD
+    A["🌕 Moon / Mars Target Profiles"] --> B["📋 Extract Target Conditions"]
+    B --> C["🛰️ Collect Earth Observation Data"]
+    C --> D["🧹 Prepare & Normalize Data"]
+    D --> E["🌍 Divide Earth into 0.5° Grid Cells"]
+    E --> F["📊 Calculate Similarity Scores"]
+    F --> G["🏆 Rank Earth Locations"]
+    G --> H["🗺️ Visualize on Interactive Globe"]
+    H --> I["🔍 Explain & Export Results"]
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ 1. PLANETARY GROUND TRUTH (signatures)                                      │
-│    Moon/Mars literature + agency products → data/targets.json               │
-│    (values, earth_percentile terrain classes, weights, source_url each)     │
-└───────────────────────────────────┬─────────────────────────────────────┘
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ 2. EARTH DATA LAYER (offline build)                                         │
-│    src/acquire/build_predictor_stack.py                                     │
-│    NASA POWER · GIBS MODIS NDVI · MODIS LST (Zenodo) · AWS Terrain Tiles    │
-│    → cache/derived/*.npy → cache/predictors.zarr (360×720 × 8 predictors)   │
-└───────────────────────────────────┬─────────────────────────────────────┘
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ 3. SCORING ENGINE (Python)                                                  │
-│    similarity.py · validation.py · robustness.py · rationale.py             │
-│    Weighted geometric mean · ranking · novelty · ROC-AUC                    │
-└───────────────────────────────────┬─────────────────────────────────────┘
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ 4. WEB APPLICATION                                                          │
-│    FastAPI (src/api/main.py) + static web/ (Three.js globe, God's Eye)      │
-│    http://127.0.0.1:8000/ · float32 score surfaces · weight sliders         │
-└─────────────────────────────────────────────────────────────────────────────┘
+
+### Step-by-step explanation
+
+| Step | Process | What happens? |
+|---|---|---|
+| 1 | Target Selection | Select a Moon or Mars location |
+| 2 | Target Signature | Extract its measurable environmental conditions |
+| 3 | Data Collection | Gather Earth observation datasets |
+| 4 | Data Processing | Clean, normalize, and prepare the data |
+| 5 | Global Grid | Analyze 78,247 land cells at 0.5° resolution |
+| 6 | Similarity Scoring | Compare each Earth cell against the target |
+| 7 | Ranking | Rank locations according to similarity |
+| 8 | Visualization | Display results on the globe and map |
+| 9 | Exploration | Inspect, explain, and export promising locations |
+
+---
+
+## 🏗️ System Architecture
+
+```text
+                 🌍 TERRA2MARS AI PLATFORM
+                           │
+             ┌─────────────┴─────────────┐
+             │                           │
+       FRONTEND APPLICATION         BACKEND API
+             │                           │
+       JavaScript / Three.js          FastAPI
+             │                           │
+     ┌───────┼────────┐          ┌───────┼────────┐
+     │       │        │          │       │        │
+   Globe   Map    Dashboard    Scoring  Data   Explainability
+     │       │        │        Engine  API       Engine
+     │       │        │          │       │        │
+     └───────┴────────┘          └───────┼────────┘
+                                         │
+                               DATA PROCESSING LAYER
+                                         │
+                         ┌───────────────┼──────────────┐
+                         │               │              │
+                      NASA POWER     NASA GIBS      Terrain Data
+                         │               │              │
+                         └───────────────┼──────────────┘
+                                         │
+                                  EARTH GRID DATA
+                                         │
+                                SIMILARITY RESULTS
+                                         │
+                              🌕 MOON / 🔴 MARS
 ```
 
-**God's Eye (on demand):** `GET /api/site3d` mosaics **AWS Terrain Tiles** (Terrarium); browser loads **EOx Sentinel-2 cloudless** tiles via `/api/imagery/...` (cache under `cache/sitetiles/`).
+### Main Architectural Components
 
-**Architecture diagram (video / slides):** [`docs/TerraNova-architecture-video.drawio`](docs/TerraNova-architecture-video.drawio)
-
----
-
-## Scoring model
-
-### Per-criterion similarity
-
-For criterion $k$, stored editorial range $[\mathrm{lo}_k, \mathrm{hi}_k]$, Earth envelope $[e_{\mathrm{lo},k}, e_{\mathrm{hi},k}]$, cell value $x_k$, and target $t_k$:
-
-$$
-t'_k = \mathrm{clip}\bigl(t_k,\; e_{\mathrm{lo},k},\; e_{\mathrm{hi},k}\bigr)
-$$
-
-$$
-s_k(x) = \mathrm{clip}\left(1 - \frac{\lvert x_k - t'_k \rvert}{\mathrm{hi}_k - \mathrm{lo}_k},\; 0,\; 1\right)
-$$
-
-Targets beyond anything on Earth (e.g. lunar 120 K day–night swing) are clipped to **Earth’s extreme** so the criterion means “as close as Earth gets.”
-
-### Combined score (weighted geometric mean)
-
-$$
-\mathrm{score}(x) = \prod_k s_k(x)^{w_k / \sum_j w_j}
-$$
-
-Any $s_k = 0$ **vetoes** the cell (e.g. dense vegetation cannot be saved by correct slope alone).
-
-### Criteria (Earth predictors)
-
-| Key | Measures | Primary source |
-|-----|----------|----------------|
-| `precipitation` | Mean annual precipitation (mm/yr) | [NASA POWER](https://power.larc.nasa.gov/) MERRA-2 climatology 2001–2020 |
-| `vegetation` | Annual max NDVI (0 = barren) | NASA GIBS `MODIS_Terra_L3_NDVI_Monthly` (2023) |
-| `annual_temperature_range` | Warmest − coldest monthly mean T2M (K) | NASA POWER |
-| `lst_diurnal_range` | Mean LST day − night (K) | [MODIS LST 2000–2020 (Zenodo)](https://doi.org/10.5281/zenodo.6458406); gaps filled from POWER `TS_RANGE` |
-| `slope` | Regional slope of 0.5° DEM (°) | [AWS Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) |
-| `roughness` | RMS height ~28 km window (m) | AWS Terrain Tiles |
-| `mean_annual_temperature` | Mean monthly T2M (°C) | NASA POWER (default weight 0; **Haworth** enables 2× for cold-trap proxy) |
-| `elevation` | Mean elevation (m) | AWS Terrain Tiles (default weight 0) |
-
-Land mask: Natural Earth 1:50m land minus lakes; cell scorable if ≥50% land.
-
-### Lunar cold traps (operational proxy)
-
-Absolute lunar PSR temperatures (~40 K) are **not** matched on Earth. For **Haworth**, the engine emphasizes **mean annual temperature** and literature cold-trap context instead of impossible Kelvin equality. **Planned:** ESA CCI permafrost (MAGT ≤ 0 °C) as cryic-soil layer ([`docs/DATA_REQUESTS.md`](docs/DATA_REQUESTS.md)).
+| Component | Responsibility |
+|---|---|
+| Frontend | Interactive globe, map, controls, and visualization |
+| FastAPI Backend | API endpoints and application coordination |
+| Data Acquisition | Retrieves and prepares Earth observation datasets |
+| Predictor Stack | Stores global environmental and terrain predictors |
+| Scoring Engine | Calculates similarity between target and Earth cells |
+| Explainability Engine | Describes criterion-level results |
+| God's Eye | Provides detailed local 3D terrain exploration |
 
 ---
 
-## Validation
+## 🧮 Scientific Scoring Methodology
 
-Catalog: **`data/known_analogs.json`** (USGS-style analogs, Apollo training sites, polar deserts, plus **negative controls**—Amazon, Congo, cropland, etc.).
+Terra2Mars AI uses a deterministic mathematical approach rather than relying on an AI model to decide which locations are similar.
 
-| Check | Result (current build) |
-|-------|----------------------|
-| **ROC-AUC** (analog-like vs humid/vegetated controls) | **1.00** on all five built-in targets |
-| **Leave-one-out** | Dropping **vegetation** hurts separation most; other criteria often leave AUC at 1.00 |
-| **Cross-dataset checks** | e.g. MODIS LST swing vs POWER TS_RANGE ρ ≈ 0.92 ([`/api/datachecks`](http://127.0.0.1:8000/api/datachecks)) |
+### 1. Individual Criterion Similarity
 
-Reproduce:
+For each environmental criterion, the system calculates how close an Earth measurement is to the target value.
+
+$$
+s_k(x) = \text{clip}\left(1 - \frac{|x_k - t'_k|}{hi_k - lo_k},\ 0,\ 1\right)
+$$
+
+Where:
+
+- \(x_k\): Earth measurement for criterion \(k\)
+- \(t'_k\): Normalized planetary target value
+- \(hi_k\): Upper Earth reference limit
+- \(lo_k\): Lower Earth reference limit
+- \(s_k(x)\): Similarity score between 0 and 1
+
+### 2. Weighted Overall Similarity
+
+The individual similarities are combined using a weighted geometric mean.
+
+$$
+Score(x) = \prod_k s_k(x)^{\frac{w_k}{\sum_j w_j}}
+$$
+
+Where:
+
+- \(s_k(x)\): Similarity score for criterion \(k\)
+- \(w_k\): Importance assigned to criterion \(k\)
+- \(Score(x)\): Overall similarity score
+
+**Important:** If an active criterion has zero similarity, the overall score becomes zero. This makes major mismatches visible rather than hiding them behind high scores in other criteria.
+
+---
+
+## 🌡️ Environmental & Terrain Criteria
+
+Terra2Mars AI compares Earth locations using measurable environmental and terrain characteristics.
+
+| Criterion | What does it measure? |
+|---|---|
+| 🌧️ Precipitation | Amount of rainfall |
+| 🌱 NDVI | Vegetation density |
+| 🌡️ Temperature Range | Annual temperature variation |
+| ☀️ Land Surface Temperature | Day and night surface temperature difference |
+| ⛰️ Elevation | Height above sea level |
+| 📐 Slope | Steepness of terrain |
+| 🏔️ Roughness | Variation in terrain elevation |
+| 🌡️ Mean Annual Temperature | Average yearly temperature |
+
+Each criterion can be assigned a different weight depending on the selected planetary target.
+
+---
+
+## 🛰️ Data Sources
+
+Terra2Mars AI uses Earth observation and planetary science datasets from established scientific sources.
+
+| Data Source | Application |
+|---|---|
+| [NASA POWER](https://power.larc.nasa.gov/) | Precipitation and temperature data |
+| [NASA GIBS](https://www.earthdata.nasa.gov/data/tools/gibs) | MODIS vegetation / NDVI data |
+| [NASA LP DAAC](https://lpdaac.usgs.gov/) | MODIS land surface temperature |
+| [AWS Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) | Elevation and terrain data |
+| [Natural Earth](https://www.naturalearthdata.com/) | Land masks and geographic boundaries |
+| [NASA LRO](https://science.nasa.gov/mission/lro/) | Lunar target information |
+| [NASA MOLA](https://pds-geosciences.wustl.edu/missions/mgs/megdr.html) | Mars elevation information |
+| [Sentinel-2](https://dataspace.copernicus.eu/) | Optional high-resolution local imagery |
+
+---
+
+## 🌐 Interactive Visualization
+
+Terra2Mars AI provides two main ways to explore results.
+
+### 🌍 Global Earth Explorer
+
+Explore global similarity results using the interactive globe and map.
+
+**Screenshot:** `assets/screenshots/global-globe.png`
+
+### 🗺️ God's Eye — Local Terrain Explorer
+
+Explore a selected location using detailed terrain visualization and local elevation information.
+
+**Screenshot:** `assets/screenshots/gods-eye.png`
+
+### 📊 Similarity Analysis
+
+Inspect ranked locations, criterion-level explanations, and validation results.
+
+**Screenshot:** `assets/screenshots/analysis-dashboard.png`
+
+> Replace these screenshot paths with actual screenshots from your running application.
+
+---
+
+## 🛠️ Technology Stack
+
+<table>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+</tr>
+<tr>
+<td><b>Backend</b></td>
+<td>
+
+![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white&style=flat-square)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white&style=flat-square)
+
+</td>
+</tr>
+<tr>
+<td><b>Frontend</b></td>
+<td>
+
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black&style=flat-square)
+![Three.js](https://img.shields.io/badge/Three.js-black?logo=threedotjs&logoColor=white&style=flat-square)
+
+</td>
+</tr>
+<tr>
+<td><b>Geospatial & Scientific Processing</b></td>
+<td>
+
+![NumPy](https://img.shields.io/badge/NumPy-013243?logo=numpy&logoColor=white&style=flat-square)
+![Rasterio](https://img.shields.io/badge/Rasterio-Geospatial-4B8BBE?style=flat-square)
+![Zarr](https://img.shields.io/badge/Zarr-Data%20Storage-5B8C5A?style=flat-square)
+
+</td>
+</tr>
+<tr>
+<td><b>Satellite & Planetary Data</b></td>
+<td>
+
+![NASA](https://img.shields.io/badge/NASA-Earth%20Data-0B3D91?logo=nasa&logoColor=white&style=flat-square)
+![Sentinel](https://img.shields.io/badge/Sentinel--2-Satellite%20Data-2E8B57?style=flat-square)
+
+</td>
+</tr>
+<tr>
+<td><b>Development Tools</b></td>
+<td>
+
+![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white&style=flat-square)
+![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white&style=flat-square)
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📂 Project Structure
+
+```text
+Terra2Mars-AI/
+│
+├── data/
+│   ├── targets.json
+│   └── normalization.json
+│
+├── src/
+│   ├── acquire/
+│   │   ├── calibrate.py
+│   │   ├── build_predictor_stack.py
+│   │   ├── power.py
+│   │   ├── gibs_ndvi.py
+│   │   └── landmask.py
+│   │
+│   ├── compute/
+│   │   └── terrain.py
+│   │
+│   └── api/
+│       └── main.py
+│
+├── web/
+│   ├── app.js
+│   ├── globe.js
+│   └── ...
+│
+├── cache/
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Make sure you have installed:
+
+- Python 3.10 or later
+- Git
+- A modern web browser
+
+### 1. Clone the Repository
 
 ```bash
-OFFLINE=1 python -m scripts.check_controls
+git clone https://github.com/Yakiyo/terra-nova.git
+cd terra-nova
 ```
 
-**Interpretation:** validation shows the score **separates barren/analog-like land from rainforests and humid farmland** on a 0.5° grid—it is a **screening tool**, not a field geologic survey. See [Target, status, and roadmap](#target-status-and-roadmap).
+### 2. Create a Virtual Environment
 
-Example control percentiles (lunar south pole target, from `check_controls`):
-
-| Site | Role | Typical outcome |
-|------|------|-----------------|
-| Meteor Crater, AZ | Positive (lunar training geology) | High percentile |
-| McMurdo Dry Valleys | Positive (Mars/polar analog) | High on cold targets |
-| Amazon / Congo rainforest | Negative | **~0%** score, bottom percentiles |
-| Atacama Desert | Positive (hyper-arid) | Strong on Mars-like targets |
-
----
-
-## NASA and partner data sources
-
-### Earth predictor stack (global 0.5° scoring)
-
-| Dataset | Agency / host | Role in TerraNova | Access |
-|---------|---------------|-------------------|--------|
-| MERRA-2 climatology | NASA [POWER](https://power.larc.nasa.gov/) | Precipitation, T2M range, mean temperature | API / build script |
-| MODIS Terra NDVI (MOD13C2) | NASA [GIBS](https://nasa-gibs.github.io/gibs-api-docs/) | Vegetation / abiotic mask | PNG tiles → decode |
-| MODIS Terra LST 2000–2020 | LP DAAC via [Zenodo 6458406](https://doi.org/10.5281/zenodo.6458406) | Diurnal thermal swing | GeoTIFF → `lst_modis.npy` |
-| Terrain (SRTM/GMTED/ETOPO1) | [AWS Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) | Elevation, slope, roughness | Terrarium PNG |
-| Natural Earth | Natural Earth | Land/ocean mask, country borders, gazetteer | GeoJSON in `cache/raw/` |
-
-### Planetary target signatures (literature + agency references)
-
-| Body | Sites in app | Ground-truth inputs (cited in `targets.json`) |
-|------|--------------|-----------------------------------------------|
-| **Moon** | Shackleton rim, Malapert, Haworth PSR | LRO LOLA / Diviner literature, Artemis III regions (NASA 2024), peer-reviewed polar studies |
-| **Mars** | Jezero, Gale | MOLA/HRSC context, REMS/MEDA climate tables, rover landing literature |
-
-**Next ingestion (hackathon):** NASA [PGDA Product 78](https://pgda.gsfc.nasa.gov/products/78) 5 m LOLA site DEMs/slope; HiRISE/CRISM site tiles for Mars mineralogy ([`docs/DATA_REQUESTS.md`](docs/DATA_REQUESTS.md)).
-
-### Visualization and God's Eye (not used in global score)
-
-| Dataset | Role |
-|---------|------|
-| NASA Blue Marble / GIBS WMTS | Globe basemap, cell thumbnails |
-| EOx Sentinel-2 cloudless 2020 | God's Eye imagery (CC BY-NC-SA 4.0) |
-| AWS Terrain Tiles z10 | God's Eye DEM, peek hillshade |
-| [Moon Trek](https://trek.nasa.gov/moon/) / [Mars Trek](https://trek.nasa.gov/mars/) | External verify links in UI |
-
-Full provenance JSON: **`GET /api/sources`**.
-
----
-
-## Technology stack
-
-| Layer | Technology |
-|-------|------------|
-| Scoring | Python 3.12, NumPy, Zarr, SciPy |
-| API | [FastAPI](https://fastapi.tiangolo.com/) + Uvicorn |
-| Frontend | Vanilla JS, **Three.js** (WebGL globe + God's Eye) |
-| Storage | Committed `predictors.zarr`, GeoJSON configs, optional `cache/sitetiles/` |
-| Tests | pytest, ruff |
-
----
-
-## Repository layout
-
-```
-terra-nova/
-├── data/
-│   ├── targets.json           # Moon/Mars target signatures + citations
-│   ├── normalization.json     # Ranges, Earth envelope, default weights
-│   ├── known_analogs.json     # Catalog + validation controls
-│   └── gazetteer.json         # Place-name search
-├── cache/
-│   ├── predictors.zarr        # 360×720 Earth predictor stack (committed)
-│   ├── raw/                   # Natural Earth, etc.
-│   └── sitetiles/             # God's Eye DEM/S2 (local prefetch, gitignored)
-├── src/
-│   ├── acquire/               # Offline download + build_predictor_stack
-│   ├── compute/               # similarity, validation, terrain, robustness
-│   ├── agents/rationale.py    # Rule-based explanations
-│   └── api/main.py            # FastAPI + static web/
-├── web/                       # index.html, app.js, globe.js, godseye.js, …
-├── scripts/                   # setup.ps1, check_controls.py
-├── tests/
-└── docs/                      # VIDEO_SCRIPT, DATA_REQUESTS, architecture draw.io
+```bash
+python -m venv .venv
 ```
 
----
+Activate it:
 
-## Quick start
-
-### Windows (recommended)
-
-Requires [git](https://git-scm.com/) and [uv](https://github.com/astral-sh/uv) (`winget install astral-sh.uv`):
+**Windows PowerShell**
 
 ```powershell
-git clone -b feature/v2-nasa-data-globe https://github.com/Yakiyo/terra-nova.git
-cd terra-nova
-powershell -File scripts/setup.ps1
-$env:OFFLINE = "1"
-.venv\Scripts\uvicorn src.api.main:app --host 127.0.0.1 --port 8000 --reload
+.venv\Scripts\Activate.ps1
 ```
 
-Open **http://127.0.0.1:8000/**
-
-Alternative launcher (if present locally): `powershell -File start-app.ps1` with `OFFLINE=0` to fetch missing God's Eye tiles live.
-
-### Linux / macOS
+**Linux / macOS**
 
 ```bash
-git clone -b feature/v2-nasa-data-globe https://github.com/Yakiyo/terra-nova.git
-cd terra-nova
-uv venv --python 3.12 .venv
-uv pip install --python .venv/bin/python -r requirements.txt
-OFFLINE=1 .venv/bin/uvicorn src.api.main:app --host 127.0.0.1 --port 8000
+source .venv/bin/activate
 ```
 
-### God's Eye offline prefetch
+### 3. Install Dependencies
 
 ```bash
-OFFLINE=0 python -m src.acquire.sitetiles --top 5
+pip install -r requirements.txt
 ```
 
-### Tests
+### 4. Build the Predictor Stack
 
 ```bash
-python -m pytest tests -q
-python -m ruff check src tests scripts conftest.py
-OFFLINE=1 python -m scripts.check_controls
+python -m src.acquire.build_predictor_stack
 ```
 
----
+This prepares the global predictor dataset used by the scoring engine.
 
-## HTTP API (summary)
+### 5. Start the Backend
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| `POST` | `/api/score` | Rank cells for a target; optional full score field |
-| `POST` | `/api/explain` | Breakdown for any lat/lon |
-| `GET` | `/api/validation` | ROC-AUC and control-site table |
-| `GET` | `/api/site3d` | God's Eye heightmap + terrain statistics |
-| `GET` | `/api/targets`, `/api/criteria`, `/api/sources` | Catalog and provenance |
+```bash
+uvicorn src.api.main:app --reload
+```
 
-Interactive docs: **http://127.0.0.1:8000/docs** when the server is running.
+### 6. Open the Application
 
----
+| Service | URL |
+|---|---|
+| Application | http://127.0.0.1:8000/ |
+| API Documentation | http://127.0.0.1:8000/docs |
+| Health Check | http://127.0.0.1:8000/api/health |
 
-## Target, status, and roadmap
-
-### North-star target (TerraNova)
-
-End-to-end analog discovery for Artemis and Mars surface ops:
-
-1. **Planetary ground truth** — Site-scale signatures from NASA products (e.g. **PGDA LOLA Product 78** for lunar south-pole DTMs, **HiRISE/CTX** and **CRISM** for Mars) with cited literature bounds in `targets.json`.
-2. **Global Earth screening** — Multi-stage funnel (vegetation/barren gates → thermal and aridity → **30 m** terrain where survivors warrant it), using **NASA-first** layers plus partner DEMs (e.g. **Copernicus GLO-30**) where they fill polar or resolution gaps.
-3. **Transparent scoring** — Weighted geometric mean (any zero similarity vetoes the cell), explainable per-criterion breakdown, novelty vs catalog sites.
-4. **Field context** — Operational access masks (`F_ops`), optional **cave/skylight** proxy layer, and site-scale **God’s Eye** terrain for mission rehearsal.
-
-Scoring stays **deterministic code** in `src/compute`; AI assistants may help build the repo but **never** produce rank scores.
-
-### Shipped in this repository (Space Apps 2026 MVP)
-
-| Area | In this repo |
-|------|----------------|
-| **Targets** | Five built-in Moon/Mars profiles + custom JSON (`data/targets.json`); terrain slopes/roughness via **Earth-percentile classes** tied to literature, not yet PGDA/HiRISE rasters |
-| **Earth stack** | Prebuilt **0.5°** predictor cube (`cache/predictors.zarr`): NASA POWER, GIBS MODIS NDVI, MODIS LST (Zenodo) + gap-fill, AWS Terrain Tiles slope/roughness |
-| **Scoring & validation** | Geometric mean, Earth-envelope target clamping, ROC-AUC vs known analogs and negative controls |
-| **UI** | **FastAPI** + static **Three.js** globe, weight sliders, rule-based rationale cards, **God’s Eye** 3D (~150 m Terrarium + Sentinel-2 drape) |
-| **Novelty** | Distance to **12** catalogued analog sites (`data/known_analogs.json`) |
-
-This MVP proves **global screening + explainable ranks + local terrain preview** on open NASA-centric data at hackathon scale.
-
-### Not yet implemented (gaps vs full vision)
-
-| Planned capability | Status in this repo |
-|--------------------|---------------------|
-| **PGDA Product 78** (5 m lunar DEM/slope at site folders) downsampled to **30 m** for fair compare with Earth DEM | Not ingested; lunar terrain targets use percentile classes |
-| **HiRISE/CTX** site DTMs + **CRISM** mineral / hydration ratios for Mars targets | Not in predictor stack |
-| **GEE (or equivalent) multi-stage screening funnel** @ 1 km → 30 m on survivor tiles | Single global 0.5° pass only |
-| **Copernicus GLO-30** as primary global elevation (polar coverage) | AWS Terrarium / derived slopes at 0.5° only |
-| **ESA CCI permafrost** (MAGT) for PSR / cryic-soil proxy (e.g. Haworth mode) | Documented plan; see Haworth note in [Scoring model](#scoring-model) and [`docs/DATA_REQUESTS.md`](docs/DATA_REQUESTS.md) |
-| **Operational access** (`F_ops`: roads, WDPA, hazards) | Not scored |
-| **Cave / lava-tube skylight** detection layer (LROC / HiRISE pit catalogs) | Not scored |
-| **React + MapLibre** production frontend | Not in repo; current demo is Three.js + FastAPI |
-
-Team backlog and dataset requests: [`docs/DATA_REQUESTS.md`](docs/DATA_REQUESTS.md). Mentor-style gap analysis: [`docs/REVIEW.md`](docs/REVIEW.md).
-
-### Known limits (current MVP)
-
-1. **0.5° cells (~55 km)** average small features with surroundings—not a substitute for 30 m field geology.
-2. **Terrain targets** use Earth-percentile **classes** until PGDA/HiRISE site DTMs are ingested.
-3. **Polar scoring** gaps where elevation tiles and MODIS LST are missing (gap-fill documented in `/api/sources`).
-4. **Novelty** is distance to a **12-site** catalog—not a claim of “never studied anywhere.”
-5. **Physics ceiling:** open-Earth sites cannot replicate lunar PSR vacuum or exact regolith chemistry; scores mean **best terrestrial proxy** for listed stresses.
-
-### Roadmap (post-MVP / extended hackathon)
-
-| Phase | Focus |
-|-------|--------|
-| **A — Planetary truth** | Ingest PGDA 78 + Mars ODE DTMs; refresh `targets.json` with measured slope/TRI/thermal stats |
-| **B — Earth resolution** | GEE funnel + Copernicus 30 m tiles; optional CRISM/M3-style mineral features where data allow |
-| **C — Mission ops** | Permafrost layer, `F_ops` masks, cave/skylight module; richer novelty catalog |
-| **D — Product UI** | React + MapLibre map client on the same FastAPI scoring API |
+*Note: These commands follow the project's previously documented structure. Check the repository's latest setup instructions and required data downloads before running them.*
 
 ---
 
-## Team and credits
+## 🔬 Validation & Reliability
 
-**Team DaRK_MATTER** — NASA Space Apps Challenge 2026 · Khulna, Bangladesh
+Terra2Mars AI includes validation and robustness tools to examine how reliable the similarity rankings are.
 
-| Member | Role (fill for submission) |
-|--------|---------------------------|
-| *Rafsan Kabir* | Project lead / integration |
-| *Sazidul Karim Saad* | Lunar targets & validation |
-| *Mahfuz Kamal Sohan* | Mars targets & science narrative |
-| *Rayat Bin Nasir* | Earth data pipeline |
-| *Nafi Abrar Chowdhury* | Scoring & robustness |
-| *Farhan Fuad* | Frontend & demo |
+- **ROC-AUC validation:** Evaluates separation between catalogued analogues and negative controls.
+- **Leave-one-criterion-out:** Checks how results change when a criterion is removed.
+- **Robustness testing:** Tests score stability under controlled perturbations.
+- **Explainability:** Shows how individual criteria contribute to the final result.
 
-Repository: **https://github.com/Yakiyo/terra-nova**
+The repository reports an AUC of 1.00 on its built-in validation dataset. This result applies to that dataset and validation setup; it does not establish universal accuracy or prove that every newly ranked location is a suitable mission site.
 
 ---
 
-## License
+## ⚠️ Limitations
 
-Source code: [Apache-2.0](LICENSE). Third-party: Three.js (MIT), Natural Earth (public domain). Imagery and elevation retain upstream terms—see **Data sources** in the app and `/api/sources`.
+Terra2Mars AI is a scientific screening tool, not a replacement for detailed field surveys or planetary mission engineering.
+
+- The global analysis uses 0.5° grid cells, which average local terrain conditions.
+- Some datasets have spatial gaps, particularly in polar regions.
+- Earth cannot reproduce lunar vacuum or permanently shadowed region temperatures.
+- Novelty labels depend on the available known-analogue catalogue.
+- Similarity scores indicate resemblance across selected criteria, not complete environmental equivalence.
+
+---
+
+## 🛣️ Future Improvements
+
+- [ ] Add more planetary target profiles.
+- [ ] Improve high-latitude and polar data coverage.
+- [ ] Integrate additional high-resolution terrain datasets.
+- [ ] Expand local terrain and rover mobility analysis.
+- [ ] Add more planetary environmental criteria.
+- [ ] Improve validation with additional independent analogue datasets.
+- [ ] Add richer comparison and reporting tools.
+
+---
+
+## 👥 Meet the Team
+
+<div align="center">
+
+### 🚀 TEAM TERRA2MARS AI
+
+<table>
+<tr>
+<td align="center" width="20%">
+<img src="https://ui-avatars.com/api/?name=Hafiz+Muhammad+Anas&background=123D5A&color=fff&size=160" width="110" alt="Hafiz Muhammad Anas"/><br/>
+<b>Hafiz Muhammad Anas</b><br/>
+<sub>Team Lead</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://ui-avatars.com/api/?name=Adeeb+Ur+Rehman&background=0B3D91&color=fff&size=160" width="110" alt="Adeeb Ur Rehman"/><br/>
+<b>Adeeb Ur Rehman</b><br/>
+<sub>Developer</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://ui-avatars.com/api/?name=Shayan+Baig&background=1D9E75&color=fff&size=160" width="110" alt="Shayan Baig"/><br/>
+<b>Shayan Baig</b><br/>
+<sub>Demotivator</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://ui-avatars.com/api/?name=Aimen+Ismail&background=0F6E56&color=fff&size=160" width="110" alt="Aimen Ismail"/><br/>
+<b>Aimen Ismail</b><br/>
+<sub>Presenter</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://ui-avatars.com/api/?name=Syeda+Sheza&background=123D5A&color=fff&size=160" width="110" alt="Syeda Sheza"/><br/>
+<b>Syeda Sheza</b><br/>
+<sub>Presenter</sub>
+</td>
+</tr>
+</table>
+
+</div>
+
+---
+
+## 🤝 Contributing
+
+Contributions, suggestions, and improvements are welcome.
+
+1. Fork the repository.
+2. Create a feature branch.
+3. Make your changes.
+4. Commit your changes.
+5. Submit a Pull Request.
+
+---
+
+## 📄 License
+
+Please refer to the repository's `LICENSE` file for licensing information.
+
+---
+
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:071A2F,50:123D5A,100:1D9E75&height=130&section=footer" width="100%"/>
+
+### 🌍 Exploring Earth. Understanding Other Worlds.
+
+**Built with science, satellite data, and curiosity by Team Terra2Mars AI.**
+
+*NASA Space Apps Challenge 2026*
+
+</div>
