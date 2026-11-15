@@ -16,6 +16,7 @@ from __future__ import annotations
 import base64
 import json
 import math
+import os
 import re
 import threading
 from contextlib import asynccontextmanager
@@ -26,7 +27,7 @@ import zarr
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, Response
 from starlette.staticfiles import StaticFiles
 
 from src.acquire import peek, sitetiles, thumbs, tiles
@@ -84,14 +85,16 @@ async def _lifespan(_: FastAPI):  # type: ignore[no-untyped-def]
     """Warm the robustness cache for every target under the interface defaults, in a
     background thread, so the first stability badges appear without a delay."""
 
-    def warm() -> None:
-        try:
-            for target_id in _targets():
-                robustness_report(ScoreRequest(target_id=target_id, **UI_DEFAULTS))
-        except Exception:  # warming is best effort
-            pass
+    # In serverless environments (like Vercel / AWS Lambda), avoid spinning up background threads
+    if not os.environ.get("VERCEL"):
+        def warm() -> None:
+            try:
+                for target_id in _targets():
+                    robustness_report(ScoreRequest(target_id=target_id, **UI_DEFAULTS))
+            except Exception:  # warming is best effort
+                pass
 
-    threading.Thread(target=warm, daemon=True).start()
+        threading.Thread(target=warm, daemon=True).start()
     yield
 
 
@@ -1094,6 +1097,19 @@ class _RevalidatingStaticFiles(StaticFiles):
         response = await super().get_response(path, scope)
         response.headers["Cache-Control"] = "no-cache"
         return response
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon() -> Response:
+    return Response(status_code=204)
+
+
+@app.get("/", include_in_schema=False)
+def index_html() -> FileResponse:
+    index_file = WEB_PATH / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file, media_type="text/html", headers={"Cache-Control": "no-cache"})
+    raise HTTPException(status_code=404, detail="index.html not found")
 
 
 if WEB_PATH.exists():

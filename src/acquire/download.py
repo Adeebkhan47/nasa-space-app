@@ -15,7 +15,7 @@ try:  # verify TLS with the operating system's trust store when available
     import truststore
 
     truststore.inject_into_ssl()
-except ImportError:  # pragma: no cover - falls back to Python's bundled CAs
+except Exception:  # pragma: no cover - falls back to Python's bundled CAs
     pass
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
