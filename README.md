@@ -1,14 +1,14 @@
  <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:071A2F,50:123D5A,100:1D9E75&height=220&section=header&text=TERRANOVA&fontSize=65&fontColor=ffffff&animation=fadeIn&fontAlignY=36&desc=Discovering%20Earth's%20Best%20Planetary%20Analogues&descAlignY=58&descSize=17" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:071A2F,50:123D5A,100:1D9E75&height=220&section=header&text=TERRA2MARS%20AI&fontSize=58&fontColor=ffffff&animation=fadeIn&fontAlignY=36&desc=Discovering%20Earth's%20Best%20Planetary%20Analogues&descAlignY=58&descSize=17" width="100%"/>
 
-# 🌍 TerraNova
+# 🌍 Terra2Mars AI
 
 ### Finding Earth Locations That Resemble the Moon and Mars
 
 [![NASA Space Apps](https://img.shields.io/badge/NASA-Space%20Apps%202026-0B3D91?style=for-the-badge&logo=nasa&logoColor=white)](https://www.spaceappschallenge.org/)
 [![Python](https://img.shields.io/badge/Python-Backend-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![JavaScript](https://img.shields.io/badge/Frontend-JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Three.js](https://img.shields.io/badge/3D-Three.js-black?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org)
 [![NASA Data](https://img.shields.io/badge/Data-NASA%20Earth%20Science-0B3D91?style=for-the-badge&logo=nasa&logoColor=white)](https://earthdata.nasa.gov)
@@ -25,13 +25,13 @@
 
 ## 📖 Overview
 
-**TerraNova** is a planetary analogue discovery platform that identifies locations on Earth with environmental and terrain characteristics similar to selected locations on the Moon and Mars.
+**Terra2Mars AI** is a planetary analogue discovery platform that identifies locations on Earth with environmental and terrain characteristics similar to selected locations on the Moon and Mars.
 
 Space agencies need to understand how extraterrestrial environments may affect future exploration missions. However, studying these environments directly is difficult and expensive.
 
-TerraNova addresses this challenge by comparing planetary target conditions with real Earth observation data and ranking locations according to their similarity.
+Terra2Mars AI addresses this challenge by comparing planetary target conditions with real Earth observation data and ranking locations according to their similarity.
 
-### 🌎 What does TerraNova do?
+### 🌎 What Does Terra2Mars AI Do?
 
 - 🛰️ **Analyzes Earth Data** — Uses NASA and partner satellite datasets.
 - 🌕 **Compares Moon Locations** — Evaluates Earth locations against selected lunar sites.
@@ -133,11 +133,9 @@ Work with results outside the platform.
 
 ---
 
-## 🛰️ How TerraNova Works
+## 🛰️ How Terra2Mars AI Works
 
-TerraNova follows a data-driven workflow to identify potential Earth analogues.
-
-<div align="center">
+Terra2Mars AI follows a data-driven workflow to identify potential Earth analogues.
 
 ```mermaid
 flowchart TD
@@ -150,8 +148,6 @@ flowchart TD
     G --> H["🗺️ Visualize on Interactive Globe"]
     H --> I["🔍 Explain & Export Results"]
 ```
-
-</div>
 
 ### Step-by-step explanation
 
@@ -171,10 +167,8 @@ flowchart TD
 
 ## 🏗️ System Architecture
 
-<div align="center">
-
 ```text
-                 🌍 TERRANOVA PLATFORM
+                 🌍 TERRA2MARS AI PLATFORM
                            │
              ┌─────────────┴─────────────┐
              │                           │
@@ -204,9 +198,7 @@ flowchart TD
                               🌕 MOON / 🔴 MARS
 ```
 
-</div>
-
-### Main architectural components
+### Main Architectural Components
 
 | Component | Responsibility |
 |---|---|
@@ -222,14 +214,14 @@ flowchart TD
 
 ## 🧮 Scientific Scoring Methodology
 
-TerraNova uses a deterministic mathematical approach rather than relying on an AI model to decide which locations are similar.
+Terra2Mars AI uses a deterministic mathematical approach rather than relying on an AI model to decide which locations are similar.
 
 ### 1. Individual Criterion Similarity
 
 For each environmental criterion, the system calculates how close an Earth measurement is to the target value.
 
 $$
-s_k(x) = \operatorname{clip}\left(1 - \frac{|x_k - t'_k|}{hi_k - lo_k},\ 0,\ 1\right)
+s_k(x) = \text{clip}\left(1 - \frac{|x_k - t'_k|}{hi_k - lo_k},\ 0,\ 1\right)
 $$
 
 Where:
@@ -244,12 +236,15 @@ Where:
 
 The individual similarities are combined using a weighted geometric mean.
 
-\[
-Score(x)=
-\prod_k s_k(x)^{\frac{w_k}{\sum_j w_j}}
-\]
+$$
+Score(x) = \prod_k s_k(x)^{\frac{w_k}{\sum_j w_j}}
+$$
 
-Where \(w_k\) represents the importance of each criterion.
+Where:
+
+- \(s_k(x)\): Similarity score for criterion \(k\)
+- \(w_k\): Importance assigned to criterion \(k\)
+- \(Score(x)\): Overall similarity score
 
 **Important:** If an active criterion has zero similarity, the overall score becomes zero. This makes major mismatches visible rather than hiding them behind high scores in other criteria.
 
@@ -257,7 +252,7 @@ Where \(w_k\) represents the importance of each criterion.
 
 ## 🌡️ Environmental & Terrain Criteria
 
-TerraNova compares Earth locations using measurable environmental and terrain characteristics.
+Terra2Mars AI compares Earth locations using measurable environmental and terrain characteristics.
 
 | Criterion | What does it measure? |
 |---|---|
@@ -276,7 +271,7 @@ Each criterion can be assigned a different weight depending on the selected plan
 
 ## 🛰️ Data Sources
 
-TerraNova uses Earth observation and planetary science datasets from established scientific sources.
+Terra2Mars AI uses Earth observation and planetary science datasets from established scientific sources.
 
 | Data Source | Application |
 |---|---|
@@ -293,25 +288,25 @@ TerraNova uses Earth observation and planetary science datasets from established
 
 ## 🌐 Interactive Visualization
 
-TerraNova provides two main ways to explore results:
+Terra2Mars AI provides two main ways to explore results.
 
 ### 🌍 Global Earth Explorer
 
 Explore global similarity results using the interactive globe and map.
 
-**Suggested screenshot:** `assets/screenshots/global-globe.png`
+**Screenshot:** `assets/screenshots/global-globe.png`
 
 ### 🗺️ God's Eye — Local Terrain Explorer
 
 Explore a selected location using detailed terrain visualization and local elevation information.
 
-**Suggested screenshot:** `assets/screenshots/gods-eye.png`
+**Screenshot:** `assets/screenshots/gods-eye.png`
 
 ### 📊 Similarity Analysis
 
 Inspect ranked locations, criterion-level explanations, and validation results.
 
-**Suggested screenshot:** `assets/screenshots/analysis-dashboard.png`
+**Screenshot:** `assets/screenshots/analysis-dashboard.png`
 
 > Replace these screenshot paths with actual screenshots from your running application.
 
@@ -377,7 +372,7 @@ Inspect ranked locations, criterion-level explanations, and validation results.
 ## 📂 Project Structure
 
 ```text
-TerraNova/
+Terra2Mars-AI/
 │
 ├── data/
 │   ├── targets.json
@@ -474,13 +469,13 @@ uvicorn src.api.main:app --reload
 | API Documentation | http://127.0.0.1:8000/docs |
 | Health Check | http://127.0.0.1:8000/api/health |
 
-*Note: These commands follow the project's current documented structure. Check the repository's latest setup instructions and required data downloads before running them.*
+*Note: These commands follow the project's previously documented structure. Check the repository's latest setup instructions and required data downloads before running them.*
 
 ---
 
 ## 🔬 Validation & Reliability
 
-TerraNova includes validation and robustness tools to examine how reliable the similarity rankings are.
+Terra2Mars AI includes validation and robustness tools to examine how reliable the similarity rankings are.
 
 - **ROC-AUC validation:** Evaluates separation between catalogued analogues and negative controls.
 - **Leave-one-criterion-out:** Checks how results change when a criterion is removed.
@@ -493,7 +488,7 @@ The repository reports an AUC of 1.00 on its built-in validation dataset. This r
 
 ## ⚠️ Limitations
 
-TerraNova is a scientific screening tool, not a replacement for detailed field surveys or planetary mission engineering.
+Terra2Mars AI is a scientific screening tool, not a replacement for detailed field surveys or planetary mission engineering.
 
 - The global analysis uses 0.5° grid cells, which average local terrain conditions.
 - Some datasets have spatial gaps, particularly in polar regions.
@@ -519,20 +514,37 @@ TerraNova is a scientific screening tool, not a replacement for detailed field s
 
 <div align="center">
 
-### 🚀 Team TerraNova
+### 🚀 TEAM TERRA2MARS AI
 
-| Team Member | Role |
-|:---:|:---:|
-| <img src="https://ui-avatars.com/api/?name=Hafiz+Muhammad+Anas&background=123D5A&color=fff&size=120" width="90"/> | **Hafiz Muhammad Anas** |
-| **Team Lead** | Project coordination & leadership |
-| <img src="https://ui-avatars.com/api/?name=Adeeb+Ur+Rehman&background=0B3D91&color=fff&size=120" width="90"/> | **Adeeb Ur Rehman** |
-| **Developer** | Software development |
-| <img src="https://ui-avatars.com/api/?name=Shayan+Baig&background=1D9E75&color=fff&size=120" width="90"/> | **Shayan Baig** |
-| **Demotivator** | Team role |
-| <img src="https://ui-avatars.com/api/?name=Aimen+Ismail&background=0F6E56&color=fff&size=120" width="90"/> | **Aimen Ismail** |
-| **Presenter** | Project communication |
-| <img src="https://ui-avatars.com/api/?name=Syeda+Sheza&background=123D5A&color=fff&size=120" width="90"/> | **Syeda Sheza** |
-| **Presenter** | Project communication |
+<table>
+<tr>
+<td align="center" width="20%">
+<img src="https://ui-avatars.com/api/?name=Hafiz+Muhammad+Anas&background=123D5A&color=fff&size=160" width="110" alt="Hafiz Muhammad Anas"/><br/>
+<b>Hafiz Muhammad Anas</b><br/>
+<sub>Team Lead</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://ui-avatars.com/api/?name=Adeeb+Ur+Rehman&background=0B3D91&color=fff&size=160" width="110" alt="Adeeb Ur Rehman"/><br/>
+<b>Adeeb Ur Rehman</b><br/>
+<sub>Developer</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://ui-avatars.com/api/?name=Shayan+Baig&background=1D9E75&color=fff&size=160" width="110" alt="Shayan Baig"/><br/>
+<b>Shayan Baig</b><br/>
+<sub>Demotivator</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://ui-avatars.com/api/?name=Aimen+Ismail&background=0F6E56&color=fff&size=160" width="110" alt="Aimen Ismail"/><br/>
+<b>Aimen Ismail</b><br/>
+<sub>Presenter</sub>
+</td>
+<td align="center" width="20%">
+<img src="https://ui-avatars.com/api/?name=Syeda+Sheza&background=123D5A&color=fff&size=160" width="110" alt="Syeda Sheza"/><br/>
+<b>Syeda Sheza</b><br/>
+<sub>Presenter</sub>
+</td>
+</tr>
+</table>
 
 </div>
 
@@ -562,7 +574,7 @@ Please refer to the repository's `LICENSE` file for licensing information.
 
 ### 🌍 Exploring Earth. Understanding Other Worlds.
 
-**Built with science, satellite data, and curiosity by Team TerraNova.**
+**Built with science, satellite data, and curiosity by Team Terra2Mars AI.**
 
 *NASA Space Apps Challenge 2026*
 
