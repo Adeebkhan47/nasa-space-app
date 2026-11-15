@@ -1,5 +1,20 @@
-[tool.vercel]
-entrypoint = "main:app"
+[project]
+name = "terranova"
+version = "2.0.0"
+description = "TerraNova - Earth analogs for Moon and Mars base sites"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.141.1",
+    "numpy==2.3.5",
+    "pillow==11.1.0",
+    "pydantic==2.10.5",
+    "rasterio==1.5.1",
+    "scipy==1.16.3",
+    "starlette==1.6.0",
+    "truststore==0.10.4",
+    "zarr==3.4.0",
+    "uvicorn==0.53.0",
+]
 
-[tool.fastapi]
+[tool.vercel]
 entrypoint = "main:app"
